@@ -16,6 +16,8 @@ interface Lobby {
   streamerMode: boolean;
   timeConstraint: boolean;
   highScore: number;
+  inGame: boolean;
+  countdown: number;
 }
 
 interface LobbyOptions {
@@ -52,10 +54,12 @@ export const createLobby = ({
     playerCards,
     otherPlayersCards,
     lastPlayedCard: 0,
-    playedCardsHistory: [], // Initialize the history array
+    playedCardsHistory: [],
     streamerMode,
     timeConstraint,
     highScore: 0,
+    inGame: false,
+    countdown: 0,
   };
 
   assignCardsToPlayers(lobbyCode);
@@ -67,14 +71,13 @@ export const createLobby = ({
 export const assignCardsToPlayers = (lobbyCode: string) => {
   const lobby = lobbies[lobbyCode];
   if (lobby) {
-    const totalCards = Array.from({ length: 100 }, (_, i) => i + 1); // Generate cards 1 to 100
-    const shuffledCards = totalCards.sort(() => Math.random() - 0.5); // Shuffle the cards
+    const totalCards = Array.from({ length: 100 }, (_, i) => i + 1);
+    const shuffledCards = totalCards.sort(() => Math.random() - 0.5);
 
-    const numCardsPerPlayer = lobby.level; // Number of cards each player gets based on the level
+    const numCardsPerPlayer = lobby.level;
 
     const playerIds = [...lobby.clients.keys()];
 
-    // First, assign the cards to each player
     playerIds.forEach((clientId, index) => {
       const start = index * numCardsPerPlayer;
       const end = start + numCardsPerPlayer;
@@ -82,7 +85,6 @@ export const assignCardsToPlayers = (lobbyCode: string) => {
       lobby.playerCards.set(clientId, clientCards);
     });
 
-    // Then, assign other players' cards to each player
     playerIds.forEach((clientId) => {
       const otherCards = playerIds
         .filter((id) => id !== clientId)
@@ -112,10 +114,12 @@ export const sendCardsToClients = (lobbyCode: string) => {
           myCards,
           otherPlayersCards,
           lastPlayedCard: lobby.lastPlayedCard,
-          playedCardsHistory: lobby.playedCardsHistory, // Include the history
+          playedCardsHistory: lobby.playedCardsHistory,
           streamerMode: lobby.streamerMode,
           timeConstraint: lobby.timeConstraint,
           highScore: lobby.highScore,
+          countdown: lobby.countdown,
+          inGame: lobby.inGame,
         },
       };
 
@@ -142,20 +146,53 @@ export const addClientToLobby = (
   }
 };
 
+export const sendInGameStateToClients = (lobbyCode: string) => {
+  const lobby = lobbies[lobbyCode];
+  if (lobby) {
+    const inGameState = {
+      type: 'inGameUpdate',
+      payload: {
+        inGame: lobby.inGame,
+      },
+    };
+
+    const updateData = JSON.stringify(inGameState);
+
+    lobby.clients.forEach((client) => {
+      if (client.readyState === WsWebSocket.OPEN) {
+        client.send(updateData);
+      }
+    });
+  }
+};
+
+
 export const updateReadyCount = (lobbyCode: string) => {
   const lobby = lobbies[lobbyCode];
   if (lobby) {
     lobby.playersReady++;
 
     if (lobby.playersReady === lobby.playerCount) {
-      if (lobby.playerCards.size === 0 ){
+      if (lobby.playerCards.size === 0) {
         assignCardsToPlayers(lobbyCode);
       }
+      lobby.countdown = 3;
+      lobby.inGame = false;
+      sendCardsToClients(lobbyCode);
 
-      sendCardsToClients(lobbyCode); 
+      const countdownInterval = setInterval(() => {
+        if (lobby.countdown && lobby.countdown > 0) {
+          lobby.countdown -= 1;
+          if (lobby.countdown === 0) {
+            lobby.inGame = true;
+            clearInterval(countdownInterval)
+          }
+          sendCardsToClients(lobbyCode);
+        }
+      }, 1000);
+    } else {
+      sendCardsToClients(lobbyCode);
     }
-    sendCardsToClients(lobbyCode); 
-
   }
 };
 
@@ -169,21 +206,18 @@ export const handlePlayCard = (
     const playerCards = lobby.playerCards.get(clientId) || [];
     const otherPlayersCards = lobby.otherPlayersCards.get(clientId) || [];
 
-    // Remove the played card from the player's hand
     const cardIndex = playerCards.indexOf(card);
     if (cardIndex > -1) {
       playerCards.splice(cardIndex, 1);
       lobby.playerCards.set(clientId, playerCards);
     } else {
       console.log(`Card ${card} not found in player ${clientId}'s hand.`);
-      return; // Card not found, something went wrong
+      return;
     }
 
-    // Add the played card to the history
     lobby.playedCardsHistory.push(card);
     lobby.lastPlayedCard = card;
 
-    // Determine if the player loses
     let playerLoses = false;
     for (const otherCards of otherPlayersCards) {
       if (otherCards.some((otherCard) => card > otherCard)) {
@@ -197,14 +231,12 @@ export const handlePlayCard = (
       console.log(
         `Player ${clientId} loses because they played a higher card.`
       );
-      // Send the updated state indicating the player has lost
       sendCardsToClients(lobbyCode);
       return;
     }
 
     console.log(`Player ${clientId} played a valid card ${card}.`);
 
-    // Check if the player played the lowest card in the game
     const allCards = [...playerCards, ...otherPlayersCards.flat()];
     const lowestCard = Math.min(...allCards);
 
@@ -218,7 +250,6 @@ export const handlePlayCard = (
       );
     }
 
-    // Check if all players have successfully played all their cards
     const allCardsPlayed = [...lobby.playerCards.values()].every(
       (cards) => cards.length === 0
     );
@@ -232,28 +263,33 @@ export const handlePlayCard = (
   }
 };
 
-export const nextRound = (lobbyCode: string, win:boolean, loss:boolean) => {
+export const nextRound = (lobbyCode: string, win: boolean, loss: boolean) => {
   const lobby = lobbies[lobbyCode];
   if (lobby) {
-    
-    if (win) {
+    if (win || loss) {
+      // Reset win/loss states
       lobby.win = false;
-      lobby.playersReady = 0;
-      if (lobby.level >= lobby.highScore) {
-        lobby.highScore = lobby.level
-      }
-      lobby.level += 1;
-      assignCardsToPlayers(lobbyCode);
-    }
-    if (loss) {
       lobby.loss = false;
-      lobby.playersReady = 0;
-      lobby.level = 1;
-      assignCardsToPlayers(lobbyCode);
-    }
-    sendCardsToClients(lobbyCode);
+      lobby.playersReady = 0; // Reset ready count
+
+      if (win) {
+        if (lobby.level >= lobby.highScore) {
+          lobby.highScore = lobby.level;
+        }
+        lobby.level += 1; // Progress to the next level
+      } else if (loss) {
+        lobby.level = 1; // Reset to level 1 after a loss
+      }
+
+      lobby.inGame = false; // Set game as not in progress
+      lobby.countdown = 0; // Clear any existing countdown
+
+      assignCardsToPlayers(lobbyCode); // Reassign cards for the next round
+      sendCardsToClients(lobbyCode); 
+
     }
   }
+};
 
 export const getLobby = (lobbyCode: string): Lobby | undefined => {
   return lobbies[lobbyCode];

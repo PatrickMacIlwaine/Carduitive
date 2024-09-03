@@ -14,6 +14,8 @@ interface GameState {
   timeConstraint: boolean;
   playedCardsHistory: Array<number>;
   highScore: number;
+  inGame: boolean;
+  countdown: number;
 }
 
 const initialGameState: GameState = {
@@ -30,6 +32,8 @@ const initialGameState: GameState = {
   timeConstraint: false,
   playedCardsHistory: [],
   highScore: 1,
+  inGame: false,
+  countdown: 0,
 };
 
 export const useWebSocket = (
@@ -56,7 +60,10 @@ export const useWebSocket = (
       console.log('Message from server:', event.data);
       const message = JSON.parse(event.data);
 
-      if (message.type === 'lobbyUpdate' || 'fullStateUpdate') {
+      if (
+        message.type === 'lobbyUpdate' ||
+        message.type === 'fullStateUpdate'
+      ) {
         console.log('Received lobby update:', message.payload);
 
         setGameState((prevState) => ({
@@ -79,6 +86,8 @@ export const useWebSocket = (
           playedCardsHistory:
             message.payload.playedCardsHistory ?? prevState.playedCardsHistory,
           highScore: message.payload.highScore ?? prevState.highScore,
+          inGame: message.payload.inGame ?? prevState.inGame,
+          countdown: message.payload.countdown ?? prevState.countdown,
         }));
       }
     };
