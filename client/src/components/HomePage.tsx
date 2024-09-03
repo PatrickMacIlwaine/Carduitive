@@ -1,20 +1,17 @@
-import React, { useState } from "react"
-import StartNewGame from "./StartNewGameButton"
+import React, { useState } from "react";
+import StartNewGame from "./StartNewGameButton";
 import HowToPlayButton from "./HowToPlayButton";
 
 function HomePage() {
-
-  const defaultSettings = {}
+  const defaultSettings = {};
   const [settings, setSettings] = useState(defaultSettings);
-  
 
   return (
     <div>
       <h1 className="text-5xl font-bold"> Carduitive </h1>
       <StartNewGame settings={settings} />
-      <HowToPlayButton/>
-
+      <HowToPlayButton />
     </div>
   );
 }
-export default HomePage
+export default HomePage;

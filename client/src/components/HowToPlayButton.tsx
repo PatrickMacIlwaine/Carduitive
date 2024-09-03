@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import HowToPlayModal from './HowToPlayModal';
+import React, { useState } from "react";
+import HowToPlayModal from "./HowToPlayModal";
 
 export default function HowToPlayButton(props: any) {
   const [displayStartModal, setDisplayStartModal] = useState(false);

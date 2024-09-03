@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 interface CountDownProps {
   countdown: number;
@@ -12,8 +12,8 @@ export default function CountDown({ countdown }: CountDownProps) {
   }, [countdown]);
 
   return (
-    <div style={{ textAlign: 'center', fontSize: '48px', fontWeight: 'bold' }}>
-      {displayedCount > 0 ? displayedCount : 'Go!'}
+    <div style={{ textAlign: "center", fontSize: "48px", fontWeight: "bold" }}>
+      {displayedCount > 0 ? displayedCount : "Go!"}
     </div>
   );
 }

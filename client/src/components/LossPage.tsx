@@ -5,11 +5,11 @@ export default function LossPage(props: any) {
     if (ws && ws.readyState === WebSocket.OPEN) {
       sendMessage(
         JSON.stringify({
-          type: 'nextRound',
+          type: "nextRound",
           lobbyCode,
           win: false,
           loss: true,
-        })
+        }),
       );
     } else {
       console.log('WebSocket is not open. Cannot send "ready" message.');

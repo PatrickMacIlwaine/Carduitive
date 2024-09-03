@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 export default function PreStartPage(props: any) {
   const { ws, sendMessage, lobbyCode, clientId, gameState } = props;
@@ -13,10 +13,10 @@ export default function PreStartPage(props: any) {
     if (ws && ws.readyState === WebSocket.OPEN) {
       sendMessage(
         JSON.stringify({
-          type: 'ready',
+          type: "ready",
           lobbyCode,
           clientId,
-        })
+        }),
       );
     } else {
       console.log('WebSocket is not open. Cannot send "ready" message.');

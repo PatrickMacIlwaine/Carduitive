@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from "react";
 
 interface GameState {
   playersConnected: number;
@@ -15,7 +15,7 @@ interface GameState {
   playedCardsHistory: Array<number>;
   highScore: number;
   inGame: boolean;
-  countdown: number; 
+  countdown: number;
 }
 
 const initialGameState: GameState = {
@@ -32,8 +32,8 @@ const initialGameState: GameState = {
   timeConstraint: false,
   playedCardsHistory: [],
   highScore: 1,
-  inGame: false, 
-  countdown: 0, 
+  inGame: false,
+  countdown: 0,
 };
 
 const GameStateContext = createContext<{
@@ -58,7 +58,7 @@ export const GameStateProvider = ({
 export const useGameState = () => {
   const context = useContext(GameStateContext);
   if (!context) {
-    throw new Error('useGameState must be used within a GameStateProvider');
+    throw new Error("useGameState must be used within a GameStateProvider");
   }
   return context;
 };

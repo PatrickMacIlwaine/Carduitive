@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import Backdrop from './BackDrop';
-import { useNavigate } from 'react-router-dom';
-import { time } from 'console';
+import React, { useState } from "react";
+import Backdrop from "./BackDrop";
+import { useNavigate } from "react-router-dom";
+import { time } from "console";
 
 interface StartNewGameModalProps {
   onClose: () => void;
@@ -19,15 +19,16 @@ export default function StartNewGameModal({ onClose }: StartNewGameModalProps) {
     setLoadingSymbol(true);
 
     try {
-      const response = await fetch('http://localhost:3001/create-lobby', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3001/create-lobby", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           playerCount,
           streamerMode,
-          timeConstraint}),
+          timeConstraint,
+        }),
       });
       const data = await response.json();
 
@@ -35,7 +36,7 @@ export default function StartNewGameModal({ onClose }: StartNewGameModalProps) {
         navigate(`/game/${data.lobbyCode}`);
       }
     } catch (error) {
-      console.error('Error creating lobby:', error);
+      console.error("Error creating lobby:", error);
     } finally {
       setLoadingSymbol(false);
     }
@@ -82,9 +83,7 @@ export default function StartNewGameModal({ onClose }: StartNewGameModalProps) {
               <label className="mr-2">Number of Players:</label>
               <select
                 value={playerCount}
-                onChange={(e) =>
-                  setPlayerCount(parseInt(e.target.value, 10))
-                }
+                onChange={(e) => setPlayerCount(parseInt(e.target.value, 10))}
                 className="p-2 border rounded"
               >
                 {[2, 3, 4, 5, 6].map((number) => (

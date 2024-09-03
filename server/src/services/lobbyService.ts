@@ -1,5 +1,5 @@
-import { WebSocket as WsWebSocket } from 'ws';
-import { v4 as uuidv4 } from 'uuid';
+import { WebSocket as WsWebSocket } from "ws";
+import { v4 as uuidv4 } from "uuid";
 
 interface Lobby {
   clients: Map<string, WsWebSocket>;
@@ -33,7 +33,7 @@ export const createLobby = ({
   streamerMode,
   timeConstraint,
 }: LobbyOptions): string => {
-  console.log('Creating lobby with options:', {
+  console.log("Creating lobby with options:", {
     playerCount,
     streamerMode,
     timeConstraint,
@@ -102,7 +102,7 @@ export const sendCardsToClients = (lobbyCode: string) => {
       const otherPlayersCards = lobby.otherPlayersCards.get(clientId);
 
       const fullState = {
-        type: 'fullStateUpdate',
+        type: "fullStateUpdate",
         payload: {
           connectedPlayers: lobby.clients.size,
           playersReady: lobby.playersReady,
@@ -135,7 +135,7 @@ export const sendCardsToClients = (lobbyCode: string) => {
 export const addClientToLobby = (
   lobbyCode: string,
   client: WsWebSocket,
-  clientId: string
+  clientId: string,
 ) => {
   const lobby = lobbies[lobbyCode];
   if (lobby) {
@@ -150,7 +150,7 @@ export const sendInGameStateToClients = (lobbyCode: string) => {
   const lobby = lobbies[lobbyCode];
   if (lobby) {
     const inGameState = {
-      type: 'inGameUpdate',
+      type: "inGameUpdate",
       payload: {
         inGame: lobby.inGame,
       },
@@ -165,7 +165,6 @@ export const sendInGameStateToClients = (lobbyCode: string) => {
     });
   }
 };
-
 
 export const updateReadyCount = (lobbyCode: string) => {
   const lobby = lobbies[lobbyCode];
@@ -185,7 +184,7 @@ export const updateReadyCount = (lobbyCode: string) => {
           lobby.countdown -= 1;
           if (lobby.countdown === 0) {
             lobby.inGame = true;
-            clearInterval(countdownInterval)
+            clearInterval(countdownInterval);
           }
           sendCardsToClients(lobbyCode);
         }
@@ -199,7 +198,7 @@ export const updateReadyCount = (lobbyCode: string) => {
 export const handlePlayCard = (
   lobbyCode: string,
   clientId: string,
-  card: number
+  card: number,
 ) => {
   const lobby = lobbies[lobbyCode];
   if (lobby) {
@@ -229,7 +228,7 @@ export const handlePlayCard = (
     if (playerLoses) {
       lobby.loss = true;
       console.log(
-        `Player ${clientId} loses because they played a higher card.`
+        `Player ${clientId} loses because they played a higher card.`,
       );
       sendCardsToClients(lobbyCode);
       return;
@@ -242,16 +241,16 @@ export const handlePlayCard = (
 
     if (card === lowestCard) {
       console.log(
-        `Player ${clientId} played the lowest card. The game continues.`
+        `Player ${clientId} played the lowest card. The game continues.`,
       );
     } else {
       console.log(
-        `Player ${clientId} played ${card}, which is not the lowest.`
+        `Player ${clientId} played ${card}, which is not the lowest.`,
       );
     }
 
     const allCardsPlayed = [...lobby.playerCards.values()].every(
-      (cards) => cards.length === 0
+      (cards) => cards.length === 0,
     );
 
     if (allCardsPlayed) {
@@ -285,8 +284,7 @@ export const nextRound = (lobbyCode: string, win: boolean, loss: boolean) => {
       lobby.countdown = 0; // Clear any existing countdown
 
       assignCardsToPlayers(lobbyCode); // Reassign cards for the next round
-      sendCardsToClients(lobbyCode); 
-
+      sendCardsToClients(lobbyCode);
     }
   }
 };

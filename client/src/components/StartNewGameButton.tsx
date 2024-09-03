@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import StartNewGameModal from './StartNewGameModal';
+import React, { useState } from "react";
+import StartNewGameModal from "./StartNewGameModal";
 
 export default function StartNewGame(props: any) {
   const [displayStartModal, setDisplayStartModal] = useState(false);

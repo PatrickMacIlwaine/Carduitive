@@ -5,10 +5,10 @@ export default function InGame(props: any) {
     if (ws && ws.readyState === WebSocket.OPEN) {
       sendMessage(
         JSON.stringify({
-          type: 'playCard',
+          type: "playCard",
           clientId,
           card,
-        })
+        }),
       );
     } else {
       console.log('WebSocket is not open. Cannot send "ready" message.');
@@ -31,13 +31,17 @@ export default function InGame(props: any) {
               </button>
             ))}
           </div>
-        )
+        ),
       )}
 
       <div>Your Cards:</div>
 
       {gameState.myCards?.map((number: number) => (
-        <button onClick={ () => handleClick(number)} className="m-4" key={number}>
+        <button
+          onClick={() => handleClick(number)}
+          className="m-4"
+          key={number}
+        >
           {number}
         </button>
       ))}

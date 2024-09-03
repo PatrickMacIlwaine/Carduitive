@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface BackdropProps {
   onExit: () => void;
@@ -6,7 +6,7 @@ interface BackdropProps {
 
 function Backdrop({ onExit }: BackdropProps) {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Enter' || event.key === ' ') {
+    if (event.key === "Enter" || event.key === " ") {
       onExit();
     }
   };

@@ -1,27 +1,27 @@
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import PreStartPage from './PreStartPage';
-import InGame from './InGame';
-import WinPage from './WinPage';
-import LossPage from './LossPage';
-import CountdownPage from './CountDown';
-import { v4 as uuidv4 } from 'uuid';
-import { useWebSocket } from './hooks/useWebSocket';
+import React from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import PreStartPage from "./PreStartPage";
+import InGame from "./InGame";
+import WinPage from "./WinPage";
+import LossPage from "./LossPage";
+import CountdownPage from "./CountDown";
+import { v4 as uuidv4 } from "uuid";
+import { useWebSocket } from "./hooks/useWebSocket";
 
 export default function GameLobby() {
   const { lobbyCode } = useParams<{ lobbyCode: string }>();
   const clientId = uuidv4();
-  const SERVER_URL = 'ws://localhost:8080';
+  const SERVER_URL = "ws://localhost:8080";
   const navigate = useNavigate();
 
   const { ws, gameState, sendMessage } = useWebSocket(
-    lobbyCode || '',
+    lobbyCode || "",
     clientId,
-    SERVER_URL
+    SERVER_URL,
   );
 
   if (!lobbyCode) {
-    navigate('/');
+    navigate("/");
     return <div>Invalid lobby code, redirecting...</div>;
   }
 

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface CreateLobbyOptions {
   playerCount: number;
@@ -19,10 +19,10 @@ export const useCreateLobby = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3001/create-lobby', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3001/create-lobby", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           playerCount,
@@ -37,7 +37,7 @@ export const useCreateLobby = () => {
         navigate(`/game/${data.lobbyCode}`);
       }
     } catch (error) {
-      console.error('Error creating lobby:', error);
+      console.error("Error creating lobby:", error);
     } finally {
       setLoading(false);
     }

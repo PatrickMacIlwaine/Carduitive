@@ -1,10 +1,9 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './components/HomePage';
-import './styles.css';
-import GameLobby from './components/GameLobby';
-import { GameStateProvider } from './components/hooks/GameStateContext';
-
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "./components/HomePage";
+import "./styles.css";
+import GameLobby from "./components/GameLobby";
+import { GameStateProvider } from "./components/hooks/GameStateContext";
 
 function App() {
   return (
@@ -16,7 +15,7 @@ function App() {
         </Routes>
       </GameStateProvider>
     </div>
-  ); 
+  );
 }
 
 export default App;

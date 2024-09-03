@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 interface GameState {
   playersConnected: number;
@@ -39,7 +39,7 @@ const initialGameState: GameState = {
 export const useWebSocket = (
   lobbyCode: string,
   clientId: string,
-  SERVER_URL: string
+  SERVER_URL: string,
 ) => {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [gameState, setGameState] = useState<GameState>(initialGameState);
@@ -47,24 +47,24 @@ export const useWebSocket = (
   useEffect(() => {
     if (!lobbyCode) return;
 
-    const savedClientId = localStorage.getItem('clientId') || clientId;
-    localStorage.setItem('clientId', savedClientId);
+    const savedClientId = localStorage.getItem("clientId") || clientId;
+    localStorage.setItem("clientId", savedClientId);
 
     const socket = new WebSocket(
-      `${SERVER_URL}?lobbyCode=${lobbyCode}&clientId=${savedClientId}`
+      `${SERVER_URL}?lobbyCode=${lobbyCode}&clientId=${savedClientId}`,
     );
 
-    socket.onopen = () => console.log('WebSocket connection established');
-    socket.onerror = (error) => console.log('WebSocket error:', error);
+    socket.onopen = () => console.log("WebSocket connection established");
+    socket.onerror = (error) => console.log("WebSocket error:", error);
     socket.onmessage = (event) => {
-      console.log('Message from server:', event.data);
+      console.log("Message from server:", event.data);
       const message = JSON.parse(event.data);
 
       if (
-        message.type === 'lobbyUpdate' ||
-        message.type === 'fullStateUpdate'
+        message.type === "lobbyUpdate" ||
+        message.type === "fullStateUpdate"
       ) {
-        console.log('Received lobby update:', message.payload);
+        console.log("Received lobby update:", message.payload);
 
         setGameState((prevState) => ({
           ...prevState,
@@ -96,7 +96,7 @@ export const useWebSocket = (
 
     return () => {
       socket.close();
-      console.log('WebSocket closed');
+      console.log("WebSocket closed");
     };
   }, [lobbyCode]);
 

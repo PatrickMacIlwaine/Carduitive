@@ -1,10 +1,9 @@
-import React from 'react';
-import Backdrop from './BackDrop';
+import React from "react";
+import Backdrop from "./BackDrop";
 
 interface HowToPlayModal {
   onClose: () => void;
 }
-
 
 export default function HowToPlayModal({ onClose }: any) {
   return (
