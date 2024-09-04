@@ -13,10 +13,10 @@ export default function HowToPlayButton(props: any) {
   };
 
   return (
-    <div className="p-1 grid m-2">
+    <div className="p-4">
       <button
         onClick={handleClick}
-        className="w-48 h-16 bg-blue-300 rounded-md p-2"
+        className="w-full sm:w-64 h-16 sm:h-20 bg-secondary text-base-100 text-lg sm:text-xl font-semibold rounded-lg p-4 hover:bg-secondary-dark transition-all"
       >
         How To Play
       </button>

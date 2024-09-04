@@ -99,13 +99,13 @@ export default function StartNewGameModal({ onClose }: StartNewGameModalProps) {
         <div className="mt-6 flex justify-end space-x-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 focus:outline-none"
+            className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-accent focus:outline-none"
           >
             Cancel
           </button>
           <button
             onClick={handleCreateLobby}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none"
+            className="px-4 py-2 bg-secondary text-white rounded hover:bg-secondary-dark focus:outline-none"
           >
             Create Lobby
           </button>

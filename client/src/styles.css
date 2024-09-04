@@ -2,10 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+.bg-base-100 {
+}
+
 body {
   display: flex;
   align-items: center;
   justify-content: center;
   max-height: 100vh;
-  background-color: rgb(255, 255, 255);
+  background-color: #262626;
 }

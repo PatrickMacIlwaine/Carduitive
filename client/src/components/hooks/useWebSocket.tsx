@@ -90,6 +90,12 @@ export const useWebSocket = (
           countdown: message.payload.countdown ?? prevState.countdown,
         }));
       }
+
+      if (message.type === "resetLobby") {
+        console.log("Received resetLobby command:", message.payload);
+        window.location.reload();
+        return;
+      }
     };
 
     setWs(socket);

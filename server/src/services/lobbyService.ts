@@ -68,6 +68,30 @@ export const createLobby = ({
   return lobbyCode;
 };
 
+export const resetLobby = (lobbyCode: string) => {
+  const lobby = lobbies[lobbyCode];
+  if (lobby) {
+    lobby.playersConnected = 0;
+    lobby.playersReady = 0;
+    lobby.level = 1;
+    lobby.win = false;
+    lobby.loss = false;
+    lobby.playerCards.clear();
+    lobby.otherPlayersCards.clear();
+    lobby.lastPlayedCard = 0;
+    lobby.playedCardsHistory = [];
+    lobby.highScore = 0;
+    lobby.inGame = false;
+    lobby.countdown = 0;
+
+    sendResetLobby(lobbyCode);
+
+    console.log(`Lobby ${lobbyCode} has been reset.`);
+  } else {
+    console.log(`Lobby ${lobbyCode} not found.`);
+  }
+};
+
 export const assignCardsToPlayers = (lobbyCode: string) => {
   const lobby = lobbies[lobbyCode];
   if (lobby) {
@@ -90,6 +114,44 @@ export const assignCardsToPlayers = (lobbyCode: string) => {
         .filter((id) => id !== clientId)
         .map((id) => lobby.playerCards.get(id) || []);
       lobby.otherPlayersCards.set(clientId, otherCards);
+    });
+  }
+};
+
+export const sendResetLobby = (lobbyCode: string) => {
+  const lobby = lobbies[lobbyCode];
+  if (lobby) {
+    lobby.clients.forEach((client, clientId) => {
+      const myCards = lobby.playerCards.get(clientId);
+      const otherPlayersCards = lobby.otherPlayersCards.get(clientId);
+
+      const fullState = {
+        type: "resetLobby",
+        payload: {
+          connectedPlayers: lobby.clients.size,
+          playersReady: lobby.playersReady,
+          playerCount: lobby.playerCount,
+          playersConnected: lobby.playersConnected,
+          level: lobby.level,
+          win: lobby.win,
+          loss: lobby.loss,
+          myCards,
+          otherPlayersCards,
+          lastPlayedCard: lobby.lastPlayedCard,
+          playedCardsHistory: lobby.playedCardsHistory,
+          streamerMode: lobby.streamerMode,
+          timeConstraint: lobby.timeConstraint,
+          highScore: lobby.highScore,
+          countdown: lobby.countdown,
+          inGame: lobby.inGame,
+        },
+      };
+
+      const updateData = JSON.stringify(fullState);
+
+      if (client.readyState === WsWebSocket.OPEN) {
+        client.send(updateData);
+      }
     });
   }
 };
@@ -172,6 +234,10 @@ export const updateReadyCount = (lobbyCode: string) => {
     lobby.playersReady++;
 
     if (lobby.playersReady === lobby.playerCount) {
+      if (lobby.playersConnected < lobby.playersReady) {
+        resetLobby(lobbyCode);
+        return;
+      }
       if (lobby.playerCards.size === 0) {
         assignCardsToPlayers(lobbyCode);
       }
