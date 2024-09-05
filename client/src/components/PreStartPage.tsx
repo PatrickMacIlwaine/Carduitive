@@ -57,7 +57,7 @@ export default function PreStartPage(props: any) {
       <div className="flex flex-col items-center space-y-4 m-4 w-full sm:w-auto">
         {!gameState.streamerMode && (
           <button
-            className="w-full sm:w-64 h-auto bg-secondary text-base-100 text-lg sm:text-xl font-semibold rounded-lg p-4 hover:bg-secondary-dark transition-all"
+            className="w-10/12 sm:w-96 h-auto bg-secondary text-base-100 text-lg sm:text-xl font-semibold rounded-lg p-4 hover:bg-secondary-dark transition-all"
             onClick={handleCopyLink}
           >
             <div className="flex flex-col items-center">
@@ -71,7 +71,7 @@ export default function PreStartPage(props: any) {
 
         {gameState.streamerMode && (
           <button
-            className="w-full sm:w-64 h-16 sm:h-20 bg-secondary text-base-100 text-lg sm:text-xl font-semibold rounded-lg p-4 hover:bg-secondary-dark transition-all"
+            className="w-10/12 sm:w-96 h-32 sm:h-32 bg-secondary text-base-100 text-lg sm:text-xl font-semibold rounded-lg p-4 hover:bg-secondary-dark transition-all"
             onClick={handleCopyLink}
           >
             Click to Copy game URL
@@ -80,7 +80,7 @@ export default function PreStartPage(props: any) {
 
         {showReadyButton && (
           <button
-            className="w-full sm:w-64 h-16 sm:h-24 bg-accent text-base-100 text-lg sm:text-xl font-semibold rounded-lg p-4 hover:bg-secondary-dark transition-all"
+            className="w-10/12 sm:w-96 h-32 sm:h-32 bg-accent text-base-100 text-5xl sm:text-5xl font-semibold rounded-lg p-4 hover:bg-secondary-dark transition-all"
             onClick={handleReadyClick}
           >
             Ready

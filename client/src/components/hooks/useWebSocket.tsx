@@ -45,66 +45,61 @@ export const useWebSocket = (
   const [gameState, setGameState] = useState<GameState>(initialGameState);
 
   useEffect(() => {
-    if (!lobbyCode) return;
+  if (!lobbyCode) return;
 
-    const savedClientId = localStorage.getItem("clientId") || clientId;
-    localStorage.setItem("clientId", savedClientId);
+  const savedClientId = localStorage.getItem("clientId") || clientId;
+  localStorage.setItem("clientId", savedClientId);
 
-    const socket = new WebSocket(
+  let socket: WebSocket;
+  let reconnectTimeout: NodeJS.Timeout;
+
+  const connectWebSocket = () => {
+    socket = new WebSocket(
       `${SERVER_URL}?lobbyCode=${lobbyCode}&clientId=${savedClientId}`,
     );
 
     socket.onopen = () => console.log("WebSocket connection established");
-    socket.onerror = (error) => console.log("WebSocket error:", error);
+    
+    socket.onerror = (error) => {
+      console.log("WebSocket error:", error);
+      // Optional: Retry connecting after a short delay
+      reconnectTimeout = setTimeout(connectWebSocket, 2000);
+    };
+
     socket.onmessage = (event) => {
       console.log("Message from server:", event.data);
       const message = JSON.parse(event.data);
-
       if (
         message.type === "lobbyUpdate" ||
         message.type === "fullStateUpdate"
       ) {
-        console.log("Received lobby update:", message.payload);
-
         setGameState((prevState) => ({
           ...prevState,
-          playersConnected:
-            message.payload.playersConnected ?? prevState.playersConnected,
-          playersReady: message.payload.playersReady ?? prevState.playersReady,
-          playerCount: message.payload.playerCount ?? prevState.playerCount,
-          level: message.payload.level ?? prevState.level,
-          win: message.payload.win ?? prevState.win,
-          loss: message.payload.loss ?? prevState.loss,
-          myCards: message.payload.myCards ?? prevState.myCards,
-          otherPlayersCards:
-            message.payload.otherPlayersCards ?? prevState.otherPlayersCards,
-          lastPlayedCard:
-            message.payload.lastPlayedCard ?? prevState.lastPlayedCard,
-          streamerMode: message.payload.streamerMode ?? prevState.streamerMode,
-          timeConstraint:
-            message.payload.timeConstraint ?? prevState.timeConstraint,
-          playedCardsHistory:
-            message.payload.playedCardsHistory ?? prevState.playedCardsHistory,
-          highScore: message.payload.highScore ?? prevState.highScore,
-          inGame: message.payload.inGame ?? prevState.inGame,
-          countdown: message.payload.countdown ?? prevState.countdown,
+          ...message.payload,
         }));
       }
-
       if (message.type === "resetLobby") {
         console.log("Received resetLobby command:", message.payload);
         window.location.reload();
-        return;
       }
     };
 
-    setWs(socket);
-
-    return () => {
-      socket.close();
-      console.log("WebSocket closed");
+    socket.onclose = () => {
+      console.log("WebSocket closed. Attempting to reconnect...");
+      reconnectTimeout = setTimeout(connectWebSocket, 2000);
     };
-  }, [lobbyCode]);
+
+    setWs(socket);
+  };
+
+  connectWebSocket();
+
+  return () => {
+    socket?.close();
+    clearTimeout(reconnectTimeout);
+    console.log("WebSocket closed");
+  };
+}, [lobbyCode]);
 
   const sendMessage = (message: string) => {
     if (ws && ws.readyState === WebSocket.OPEN) {

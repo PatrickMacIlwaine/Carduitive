@@ -24,27 +24,29 @@ export default function InGame(props: any) {
         Last Played Card: {gameState.lastPlayedCard}
       </h2>
 
-      <div className="text-lg sm:text-xl text-accent font-semibold mb-4">
-        Other Players' Cards:
-      </div>
-
-      {gameState.otherPlayersCards?.map(
-        (cards: Array<number>, index: number) => (
-          <div
-            className="flex justify-center flex-wrap m-3 p-3 bg-neutral text-base-100 rounded-lg shadow-lg w-full sm:w-auto"
-            key={index}
-          >
-            {cards.map((card: number, cardIndex: number) => (
-              <button
-                className="m-4 w-12 h-12 sm:w-16 sm:h-16 bg-secondary text-base-100 font-bold rounded-lg hover:bg-secondary-dark transition-all"
-                key={cardIndex}
+      <div className="w-full flex justify-center">
+        <div className="flex flex-wrap justify-center w-full max-w-screen-lg">
+          {gameState.otherPlayersCards?.map(
+            (cards: Array<number>, playerIndex: number) => (
+              <div
+                key={playerIndex}
+                className="flex flex-col items-center justify-center w-auto"
               >
-                {card}
-              </button>
-            ))}
-          </div>
-        ),
-      )}
+                <div className="flex justify-center flex-wrap m-3">
+                  {cards.map((card: number, cardIndex: number) => (
+                    <button
+                      className="m-1 w-8 h-12 sm:w-8 sm:h-12 bg-secondary text-base-100 font-bold rounded-lg hover:bg-secondary-dark transition-all"
+                      key={cardIndex}
+                    >
+                      ?
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ),
+          )}
+        </div>
+      </div>
 
       <div className="text-lg sm:text-xl text-accent font-semibold mb-4">
         Your Cards:
@@ -54,7 +56,7 @@ export default function InGame(props: any) {
         {gameState.myCards?.map((number: number) => (
           <button
             onClick={() => handleClick(number)}
-            className="m-4 w-12 h-12 sm:w-16 sm:h-16 bg-primary text-base-100 font-bold rounded-lg hover:bg-primary-dark transition-all"
+            className="m-3 w-28 h-20 sm:w-24 sm:h-20 sm:text-4xl md:w-52 md:text-6xl lg:text:6xl bg-primary text-base-100 text-4xl font-bold rounded-lg hover:bg-secondary-dark transition-all"
             key={number}
           >
             {number}

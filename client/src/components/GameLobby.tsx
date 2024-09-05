@@ -11,13 +11,13 @@ import { useWebSocket } from "./hooks/useWebSocket";
 export default function GameLobby() {
   const { lobbyCode } = useParams<{ lobbyCode: string }>();
   const clientId = uuidv4();
-  const SERVER_URL = "ws://localhost:8080";
+  const REACT_APP_WS = 'ws://localhost:8080';
   const navigate = useNavigate();
 
   const { ws, gameState, sendMessage } = useWebSocket(
-    lobbyCode || "",
+    lobbyCode || '',
     clientId,
-    SERVER_URL,
+    REACT_APP_WS
   );
 
   if (!lobbyCode) {
@@ -31,6 +31,9 @@ export default function GameLobby() {
         highScore={gameState.highScore}
         ws={ws}
         sendMessage={sendMessage}
+        myCards={gameState.myCards}
+        otherCards={gameState.otherPlayersCards}
+        lastPlayedCard={gameState.lastPlayedCard}
       />
     );
   }
@@ -41,6 +44,7 @@ export default function GameLobby() {
         highScore={gameState.highScore}
         ws={ws}
         sendMessage={sendMessage}
+        cardHistory={gameState.playedCardsHistory}
       />
     );
   }

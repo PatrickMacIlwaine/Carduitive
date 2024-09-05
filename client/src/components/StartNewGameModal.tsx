@@ -14,12 +14,14 @@ export default function StartNewGameModal({ onClose }: StartNewGameModalProps) {
   const [loadingSymbol, setLoadingSymbol] = useState(false);
 
   const navigate = useNavigate();
+  const REACT_APP_BACKPORT = process.env.REACT_APP_BACKPORT || 'http://localhost/3001'
+
 
   const handleCreateLobby = async () => {
     setLoadingSymbol(true);
 
     try {
-      const response = await fetch("http://localhost:3001/create-lobby", {
+      const response = await fetch(`${REACT_APP_BACKPORT}/create-lobby`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

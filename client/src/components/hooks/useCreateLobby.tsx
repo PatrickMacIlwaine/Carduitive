@@ -7,6 +7,9 @@ interface CreateLobbyOptions {
   timeConstraint: boolean;
 }
 
+const REACT_APP_BACKPORT =
+  process.env.REACT_APP_BACKPORT || 'http://localhost/3001';
+
 export const useCreateLobby = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -19,10 +22,10 @@ export const useCreateLobby = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3001/create-lobby", {
-        method: "POST",
+      const response = await fetch(`${REACT_APP_BACKPORT}/create-lobby`, {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           playerCount,

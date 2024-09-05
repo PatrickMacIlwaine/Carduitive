@@ -1,5 +1,5 @@
-import { WebSocket as WsWebSocket } from "ws";
-import { v4 as uuidv4 } from "uuid";
+import { WebSocket as WsWebSocket } from 'ws';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Lobby {
   clients: Map<string, WsWebSocket>;
@@ -34,12 +34,6 @@ export const createLobby = ({
   streamerMode,
   timeConstraint,
 }: LobbyOptions): string => {
-  console.log("Creating lobby with options:", {
-    playerCount,
-    streamerMode,
-    timeConstraint,
-  });
-
   const lobbyCode = uuidv4().slice(0, 5);
   const playerCards = new Map<string, Array<number>>();
   const otherPlayersCards = new Map<string, Array<Array<number>>>();
@@ -66,7 +60,6 @@ export const createLobby = ({
 
   assignCardsToPlayers(lobbyCode);
 
-  console.log(`Lobby created with code: ${lobbyCode}`, lobbies[lobbyCode]);
   return lobbyCode;
 };
 
@@ -87,10 +80,7 @@ export const resetLobby = (lobbyCode: string) => {
     lobby.countdown = 0;
 
     sendResetLobby(lobbyCode);
-
-    console.log(`Lobby ${lobbyCode} has been reset.`);
   } else {
-    console.log(`Lobby ${lobbyCode} not found.`);
   }
 };
 
@@ -127,7 +117,7 @@ export const sendResetLobby = (lobbyCode: string) => {
       const otherPlayersCards = lobby.otherPlayersCards.get(clientId);
 
       const fullState = {
-        type: "resetLobby",
+        type: 'resetLobby',
         payload: {
           connectedPlayers: lobby.clients.size,
           playersReady: lobby.playersReady,
@@ -186,7 +176,7 @@ export const sendCardsToClients = (lobbyCode: string) => {
       const otherPlayersCards = lobby.otherPlayersCards.get(clientId);
 
       const fullState = {
-        type: "fullStateUpdate",
+        type: 'fullStateUpdate',
         payload: {
           connectedPlayers: lobby.clients.size,
           playersReady: lobby.playersReady,
@@ -219,7 +209,7 @@ export const sendCardsToClients = (lobbyCode: string) => {
 export const addClientToLobby = (
   lobbyCode: string,
   client: WsWebSocket,
-  clientId: string,
+  clientId: string
 ) => {
   const lobby = lobbies[lobbyCode];
   if (lobby) {
@@ -235,7 +225,7 @@ export const sendInGameStateToClients = (lobbyCode: string) => {
   const lobby = lobbies[lobbyCode];
   if (lobby) {
     const inGameState = {
-      type: "inGameUpdate",
+      type: 'inGameUpdate',
       payload: {
         inGame: lobby.inGame,
       },
@@ -253,27 +243,27 @@ export const sendInGameStateToClients = (lobbyCode: string) => {
 
 export const updateReadyCount = (lobbyCode: string, clientId: string) => {
   const lobby = lobbies[lobbyCode];
+
   if (lobby) {
     lobby.playerReadyStatus.set(clientId, true);
-    lobby.playersReady += 1;
+    lobby.playersReady++;
 
-    const allReady = [...lobby.playerReadyStatus.values()].every(
-      (ready) => ready,
-    );
+    if (lobby.playersReady === lobby.playerCount) {
+      lobby.inGame = true;
 
-    if (allReady && lobby.playersReady === lobby.playerCount) {
-      assignCardsToPlayers(lobbyCode);
       startGameCountdown(lobbyCode);
+      assignCardsToPlayers(lobbyCode);
+      sendCardsToClients(lobbyCode);
+    } else {
+      sendCardsToClients(lobbyCode);
     }
-
-    sendCardsToClients(lobbyCode);
   }
 };
 
 export const handlePlayCard = (
   lobbyCode: string,
   clientId: string,
-  card: number,
+  card: number
 ) => {
   const lobby = lobbies[lobbyCode];
   if (lobby) {
@@ -287,7 +277,6 @@ export const handlePlayCard = (
       playerCards.splice(cardIndex, 1);
       lobby.playerCards.set(clientId, playerCards);
     } else {
-      console.log(`Card ${card} not found in player ${clientId}'s hand.`);
       return;
     }
 
@@ -309,15 +298,12 @@ export const handlePlayCard = (
       return;
     }
 
-    console.log(`Player ${clientId} played a valid card ${card}.`);
-
     const allCardsPlayed = [...lobby.playerCards.values()].every(
-      (cards) => cards.length === 0,
+      (cards) => cards.length === 0
     );
 
     if (allCardsPlayed) {
       lobby.win = true;
-      console.log(`All cards have been successfully played. Players win!`);
     }
 
     sendCardsToClients(lobbyCode);
