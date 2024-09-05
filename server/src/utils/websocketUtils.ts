@@ -40,7 +40,7 @@ export const createWebSocketServer = (port: number) => {
 
       switch (parsedMessage.type) {
         case "ready":
-          updateReadyCount(lobbyCode);
+          updateReadyCount(lobbyCode, clientId);
           break;
 
         case "playCard":
@@ -50,8 +50,6 @@ export const createWebSocketServer = (port: number) => {
         case "nextRound":
           nextRound(lobbyCode, parsedMessage.win, parsedMessage.loss);
           break;
-
-        // Add more case statements as needed for different types of messages
 
         default:
           console.log(`Unknown message type received: ${parsedMessage.type}`);
@@ -67,6 +65,10 @@ export const createWebSocketServer = (port: number) => {
       if (lobby) {
         lobby.clients.delete(clientId);
         lobby.playersConnected = lobby.clients.size;
+
+        lobby.playersReady = [...lobby.playerReadyStatus.values()].filter(
+          (ready) => ready,
+        ).length;
 
         sendCardsToClients(lobbyCode);
       }

@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 interface Lobby {
   clients: Map<string, WsWebSocket>;
   playerCount: number;
+  playerReadyStatus: Map<string, boolean>;
   playersConnected: number;
   playersReady: number;
   level: number;
@@ -46,6 +47,7 @@ export const createLobby = ({
   lobbies[lobbyCode] = {
     clients: new Map<string, WsWebSocket>(),
     playersConnected: 0,
+    playerReadyStatus: new Map<string, boolean>(),
     playersReady: 0,
     playerCount,
     level: 1,
@@ -99,7 +101,6 @@ export const assignCardsToPlayers = (lobbyCode: string) => {
     const shuffledCards = totalCards.sort(() => Math.random() - 0.5);
 
     const numCardsPerPlayer = lobby.level;
-
     const playerIds = [...lobby.clients.keys()];
 
     playerIds.forEach((clientId, index) => {
@@ -156,6 +157,27 @@ export const sendResetLobby = (lobbyCode: string) => {
   }
 };
 
+export const startGameCountdown = (lobbyCode: string) => {
+  const lobby = lobbies[lobbyCode];
+  if (lobby) {
+    lobby.countdown = 3;
+    sendCardsToClients(lobbyCode);
+
+    const countdownInterval = setInterval(() => {
+      if (lobby.countdown > 0) {
+        lobby.countdown -= 1;
+
+        if (lobby.countdown === 0) {
+          lobby.inGame = true;
+          clearInterval(countdownInterval);
+        }
+
+        sendCardsToClients(lobbyCode);
+      }
+    }, 1000);
+  }
+};
+
 export const sendCardsToClients = (lobbyCode: string) => {
   const lobby = lobbies[lobbyCode];
   if (lobby) {
@@ -202,6 +224,7 @@ export const addClientToLobby = (
   const lobby = lobbies[lobbyCode];
   if (lobby) {
     lobby.clients.set(clientId, client);
+    lobby.playerReadyStatus.set(clientId, false);
     lobby.playersConnected = lobby.clients.size;
 
     sendCardsToClients(lobbyCode);
@@ -228,36 +251,22 @@ export const sendInGameStateToClients = (lobbyCode: string) => {
   }
 };
 
-export const updateReadyCount = (lobbyCode: string) => {
+export const updateReadyCount = (lobbyCode: string, clientId: string) => {
   const lobby = lobbies[lobbyCode];
   if (lobby) {
-    lobby.playersReady++;
+    lobby.playerReadyStatus.set(clientId, true);
+    lobby.playersReady += 1;
 
-    if (lobby.playersReady === lobby.playerCount) {
-      if (lobby.playersConnected < lobby.playersReady) {
-        resetLobby(lobbyCode);
-        return;
-      }
-      if (lobby.playerCards.size === 0) {
-        assignCardsToPlayers(lobbyCode);
-      }
-      lobby.countdown = 3;
-      lobby.inGame = false;
-      sendCardsToClients(lobbyCode);
+    const allReady = [...lobby.playerReadyStatus.values()].every(
+      (ready) => ready,
+    );
 
-      const countdownInterval = setInterval(() => {
-        if (lobby.countdown && lobby.countdown > 0) {
-          lobby.countdown -= 1;
-          if (lobby.countdown === 0) {
-            lobby.inGame = true;
-            clearInterval(countdownInterval);
-          }
-          sendCardsToClients(lobbyCode);
-        }
-      }, 1000);
-    } else {
-      sendCardsToClients(lobbyCode);
+    if (allReady && lobby.playersReady === lobby.playerCount) {
+      assignCardsToPlayers(lobbyCode);
+      startGameCountdown(lobbyCode);
     }
+
+    sendCardsToClients(lobbyCode);
   }
 };
 
@@ -270,6 +279,8 @@ export const handlePlayCard = (
   if (lobby) {
     const playerCards = lobby.playerCards.get(clientId) || [];
     const otherPlayersCards = lobby.otherPlayersCards.get(clientId) || [];
+
+    const allRemainingCards = [...playerCards, ...otherPlayersCards.flat()];
 
     const cardIndex = playerCards.indexOf(card);
     if (cardIndex > -1) {
@@ -284,8 +295,9 @@ export const handlePlayCard = (
     lobby.lastPlayedCard = card;
 
     let playerLoses = false;
-    for (const otherCards of otherPlayersCards) {
-      if (otherCards.some((otherCard) => card > otherCard)) {
+
+    for (const remainingCard of allRemainingCards) {
+      if (card > remainingCard) {
         playerLoses = true;
         break;
       }
@@ -293,27 +305,11 @@ export const handlePlayCard = (
 
     if (playerLoses) {
       lobby.loss = true;
-      console.log(
-        `Player ${clientId} loses because they played a higher card.`,
-      );
       sendCardsToClients(lobbyCode);
       return;
     }
 
     console.log(`Player ${clientId} played a valid card ${card}.`);
-
-    const allCards = [...playerCards, ...otherPlayersCards.flat()];
-    const lowestCard = Math.min(...allCards);
-
-    if (card === lowestCard) {
-      console.log(
-        `Player ${clientId} played the lowest card. The game continues.`,
-      );
-    } else {
-      console.log(
-        `Player ${clientId} played ${card}, which is not the lowest.`,
-      );
-    }
 
     const allCardsPlayed = [...lobby.playerCards.values()].every(
       (cards) => cards.length === 0,
@@ -332,24 +328,25 @@ export const nextRound = (lobbyCode: string, win: boolean, loss: boolean) => {
   const lobby = lobbies[lobbyCode];
   if (lobby) {
     if (win || loss) {
-      // Reset win/loss states
       lobby.win = false;
       lobby.loss = false;
-      lobby.playersReady = 0; // Reset ready count
+      lobby.playersReady = 0;
+      lobby.lastPlayedCard = 0;
+      lobby.playedCardsHistory = [];
 
       if (win) {
         if (lobby.level >= lobby.highScore) {
           lobby.highScore = lobby.level;
         }
-        lobby.level += 1; // Progress to the next level
+        lobby.level += 1;
       } else if (loss) {
-        lobby.level = 1; // Reset to level 1 after a loss
+        lobby.level = 1;
       }
 
-      lobby.inGame = false; // Set game as not in progress
-      lobby.countdown = 0; // Clear any existing countdown
+      lobby.inGame = false;
+      lobby.countdown = 0;
 
-      assignCardsToPlayers(lobbyCode); // Reassign cards for the next round
+      assignCardsToPlayers(lobbyCode);
       sendCardsToClients(lobbyCode);
     }
   }
