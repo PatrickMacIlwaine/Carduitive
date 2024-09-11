@@ -28,7 +28,12 @@ export const createWebSocketServer = (port: number) => {
 
     const lobby = getLobby(lobbyCode);
     if (!lobby) {
-      ws.close(1008, "Invalid lobby code");
+      const errorMessage = JSON.stringify({
+        type: 'error',
+        message: 'Lobby does not exist',
+      });
+      ws.send(errorMessage); 
+      ws.close(1008, 'Invalid lobby code');
       return;
     }
 

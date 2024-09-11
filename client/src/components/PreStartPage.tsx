@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import AdComponent from "./AdComponent";
 
 export default function PreStartPage(props: any) {
   const { ws, sendMessage, lobbyCode, clientId, gameState } = props;
@@ -91,6 +92,9 @@ export default function PreStartPage(props: any) {
             Waiting for players to ready up
           </h2>
         )}
+
+        <AdComponent  />
+
       </div>
     </div>
   );

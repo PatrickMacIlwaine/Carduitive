@@ -12,7 +12,7 @@ export default function CountDown({ countdown }: CountDownProps) {
   }, [countdown]);
 
   return (
-    <div className="text-center text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold text-primary">
+    <div className="text-center text-9xl sm:text-9xl md:text-9xl lg:text-9xl font-bold text-primary">
       {displayedCount > 0 ? displayedCount : "Go!"}
     </div>
   );

@@ -43,6 +43,8 @@ export const useWebSocket = (
 ) => {
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [gameState, setGameState] = useState<GameState>(initialGameState);
+  const [error, setError] = useState<string | null>(null); 
+
 
   useEffect(() => {
   if (!lobbyCode) return;
@@ -69,7 +71,12 @@ export const useWebSocket = (
     socket.onmessage = (event) => {
       console.log("Message from server:", event.data);
       const message = JSON.parse(event.data);
-      if (
+      if (message.type === "error" && message.message === "Lobby does not exist") {
+        console.error("Lobby does not exist. Redirecting or showing error.");
+        setError("Lobby does not exist. Please check the code or create a new lobby.");
+        socket.close();
+      }
+      else if (
         message.type === "lobbyUpdate" ||
         message.type === "fullStateUpdate"
       ) {
@@ -107,5 +114,5 @@ export const useWebSocket = (
     }
   };
 
-  return { ws, gameState, sendMessage };
+  return { ws, gameState, sendMessage, error };
 };

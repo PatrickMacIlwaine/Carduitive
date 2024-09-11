@@ -5,6 +5,7 @@ import InGame from "./InGame";
 import WinPage from "./WinPage";
 import LossPage from "./LossPage";
 import CountdownPage from "./CountDown";
+import ErrorComponent from "./ErrorComponent";
 import { v4 as uuidv4 } from "uuid";
 import { useWebSocket } from "./hooks/useWebSocket";
 
@@ -14,7 +15,7 @@ export default function GameLobby() {
   const REACT_APP_WS = 'ws://localhost:8080';
   const navigate = useNavigate();
 
-  const { ws, gameState, sendMessage } = useWebSocket(
+  const { ws, gameState, sendMessage, error } = useWebSocket(
     lobbyCode || '',
     clientId,
     REACT_APP_WS
@@ -23,6 +24,13 @@ export default function GameLobby() {
   if (!lobbyCode) {
     navigate("/");
     return <div>Invalid lobby code, redirecting...</div>;
+  }
+
+  if (error) {
+    return (
+      <ErrorComponent
+      error={error}
+    />)
   }
 
   if (gameState.loss) {

@@ -19,7 +19,7 @@ export default function HowToPlayModal({ onClose }: any) {
         </div>
 
         <div className="mt-4">
-          <p className="text-gray-700">This is how to play:</p>
+          <p className="text-gray-700">How to play has not been implemented yet lol, good luck!</p>
           {/* Add how to play instructions here */}
         </div>
 

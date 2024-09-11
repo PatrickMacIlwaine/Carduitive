@@ -214,9 +214,7 @@ export const addClientToLobby = (
   const lobby = lobbies[lobbyCode];
   if (lobby) {
     lobby.clients.set(clientId, client);
-    lobby.playerReadyStatus.set(clientId, false);
     lobby.playersConnected = lobby.clients.size;
-
     sendCardsToClients(lobbyCode);
   }
 };
@@ -248,12 +246,14 @@ export const updateReadyCount = (lobbyCode: string, clientId: string) => {
     lobby.playerReadyStatus.set(clientId, true);
     lobby.playersReady++;
 
-    if (lobby.playersReady === lobby.playerCount) {
-      lobby.inGame = true;
+    if (lobby.playersReady === lobby.playerCount  && lobby.playersReady === lobby.playersConnected) {
 
-      startGameCountdown(lobbyCode);
       assignCardsToPlayers(lobbyCode);
+      startGameCountdown(lobbyCode);
+      lobby.inGame = true;
       sendCardsToClients(lobbyCode);
+
+
     } else {
       sendCardsToClients(lobbyCode);
     }
