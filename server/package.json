@@ -10,6 +10,9 @@
   "author": "Patrick MacIlwaine",
   "license": "ISC",
   "dependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/uuid": "^10.0.0",
     "@types/ws": "^8.5.12",
     "cors": "^2.8.5",
     "express": "^4.19.2",
