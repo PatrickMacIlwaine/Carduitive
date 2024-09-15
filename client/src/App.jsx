@@ -11,6 +11,7 @@ function App() {
       <GameStateProvider>
         <Routes>
           <Route path="/" element={<HomePage />} />
+
           <Route path="game/:lobbyCode" element={<GameLobby />} />
         </Routes>
       </GameStateProvider>
