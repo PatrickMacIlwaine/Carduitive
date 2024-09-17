@@ -14,7 +14,7 @@ export default function StartNewGameModal({ onClose }: StartNewGameModalProps) {
   const [loadingSymbol, setLoadingSymbol] = useState(false);
 
   const navigate = useNavigate();
-  const REACT_APP_BACKPORT = process.env.REACT_APP_BACKPORT || 'http://localhost/3001'
+  const REACT_APP_BACKPORT = process.env.REACT_APP_BACKPORT || 'http://localhost:3001'
 
 
   const handleCreateLobby = async () => {
