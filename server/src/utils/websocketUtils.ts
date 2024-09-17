@@ -1,4 +1,4 @@
-import { WebSocketServer, WebSocket } from "ws";
+import { WebSocketServer, WebSocket } from 'ws';
 import {
   getLobby,
   addClientToLobby,
@@ -6,23 +6,23 @@ import {
   sendCardsToClients,
   handlePlayCard,
   nextRound,
-} from "../services/lobbyService";
+} from '../services/lobbyService';
 
-export const createWebSocketServer = (port: number) => {
-  const wss = new WebSocketServer({ port });
+export const createWebSocketServer = (server: any) => {
+  const wss = new WebSocketServer({ server }); 
 
-  wss.on("connection", (ws, req) => {
-    const requestUrl = new URL(`http://${req.headers.host}${req.url ?? "/"}`);
-    const lobbyCode = requestUrl.searchParams.get("lobbyCode");
-    const clientId = requestUrl.searchParams.get("clientId");
+  wss.on('connection', (ws, req) => {
+    const requestUrl = new URL(`http://${req.headers.host}${req.url ?? '/'}`);
+    const lobbyCode = requestUrl.searchParams.get('lobbyCode');
+    const clientId = requestUrl.searchParams.get('clientId');
 
     console.log(
-      `New connection attempt. LobbyCode: ${lobbyCode}, ClientId: ${clientId}`,
+      `New connection attempt. LobbyCode: ${lobbyCode}, ClientId: ${clientId}`
     );
 
     if (!lobbyCode || !clientId) {
-      console.log("Missing lobbyCode or clientId, closing connection.");
-      ws.close(1008, "Lobby code and Client ID are required");
+      console.log('Missing lobbyCode or clientId, closing connection.');
+      ws.close(1008, 'Lobby code and Client ID are required');
       return;
     }
 
@@ -32,7 +32,7 @@ export const createWebSocketServer = (port: number) => {
         type: 'error',
         message: 'Lobby does not exist',
       });
-      ws.send(errorMessage); 
+      ws.send(errorMessage);
       ws.close(1008, 'Invalid lobby code');
       return;
     }
@@ -40,19 +40,19 @@ export const createWebSocketServer = (port: number) => {
     addClientToLobby(lobbyCode, ws, clientId);
     console.log(`Client ${clientId} connected to lobby ${lobbyCode}`);
 
-    ws.on("message", (message: string) => {
+    ws.on('message', (message: string) => {
       const parsedMessage = JSON.parse(message);
 
       switch (parsedMessage.type) {
-        case "ready":
+        case 'ready':
           updateReadyCount(lobbyCode, clientId);
           break;
 
-        case "playCard":
+        case 'playCard':
           handlePlayCard(lobbyCode, clientId, parsedMessage.card);
           break;
 
-        case "nextRound":
+        case 'nextRound':
           nextRound(lobbyCode, parsedMessage.win, parsedMessage.loss);
           break;
 
@@ -63,7 +63,7 @@ export const createWebSocketServer = (port: number) => {
       console.log(`Received message from client ${clientId}: ${message}`);
     });
 
-    ws.on("close", () => {
+    ws.on('close', () => {
       console.log(`Client ${clientId} disconnected from lobby ${lobbyCode}`);
 
       const lobby = getLobby(lobbyCode);
@@ -72,7 +72,7 @@ export const createWebSocketServer = (port: number) => {
         lobby.playersConnected = lobby.clients.size;
 
         lobby.playersReady = [...lobby.playerReadyStatus.values()].filter(
-          (ready) => ready,
+          (ready) => ready
         ).length;
 
         sendCardsToClients(lobbyCode);
