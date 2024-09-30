@@ -45,7 +45,7 @@ export const createWebSocketServer = (server: any) => {
 
       switch (parsedMessage.type) {
         case 'ready':
-          updateReadyCount(lobbyCode, clientId);
+          updateReadyCount(lobbyCode);
           break;
 
         case 'playCard':

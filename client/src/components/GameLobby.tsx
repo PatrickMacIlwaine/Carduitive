@@ -12,7 +12,7 @@ import { useWebSocket } from "./hooks/useWebSocket";
 export default function GameLobby() {
   const { lobbyCode } = useParams<{ lobbyCode: string }>();
   const clientId = uuidv4();
-  const REACT_APP_WS = process.env.REACT_APP_WS_URL || "ws://localhost:8080";
+  const REACT_APP_WS = process.env.REACT_APP_WS_URL || "ws://localhost:3001";
   const navigate = useNavigate();
 
   const { ws, gameState, sendMessage, error } = useWebSocket(
