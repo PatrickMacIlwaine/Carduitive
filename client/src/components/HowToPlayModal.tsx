@@ -18,9 +18,29 @@ export default function HowToPlayModal({ onClose }: any) {
           ></button>
         </div>
 
-        <div className="mt-4">
-          <p className="text-gray-700">How to play has not been implemented yet lol, good luck!</p>
-          {/* Add how to play instructions here */}
+        <div className="m-4 p-2">
+          <ul >
+            <p>
+              Objective: Work together to play numbered cards in ascending order
+              without talking. Each player gets 1 card in Level 1, 2 cards in
+              Level 2, and so on, increasing each level.
+            </p>
+            <p>
+              Gameplay: No talking! Players can’t communicate verbally or show
+              their cards. Players take turns playing cards from their hand in
+              ascending order (smallest number first). If a player plays a card
+              out of order (lower cards still in other players’ hands), the
+              round ends and everyone loses.
+            </p>
+            <p>
+              Winning: Clear all levels successfully by playing all cards in
+              order.
+            </p>
+            <p>
+              Each player gets 1 card in Level 1, 2 cards in Level 2, and so on,
+              increasing each level.
+            </p>
+          </ul>
         </div>
 
         <div className="mt-6 flex justify-end space-x-4">

@@ -35,7 +35,7 @@ export default function InGame(props: any) {
                 <div className="flex justify-center flex-wrap m-3">
                   {cards.map((card: number, cardIndex: number) => (
                     <button
-                      className="m-1 w-8 h-12 sm:w-8 sm:h-12 bg-secondary text-base-100 font-bold rounded-lg hover:bg-secondary-dark transition-all"
+                      className="m-1 w-8 h-12 sm:w-12 sm:h-16 md:w-16 md:h-20 lg:w-20 lg:h-24 bg-secondary text-base-100 font-bold rounded-lg hover:bg-secondary-dark transition-all"
                       key={cardIndex}
                     >
                       ?
@@ -56,7 +56,7 @@ export default function InGame(props: any) {
         {gameState.myCards?.map((number: number) => (
           <button
             onClick={() => handleClick(number)}
-            className="m-3 w-28 h-20 sm:w-24 sm:h-20 sm:text-4xl md:w-52 md:text-6xl lg:text:6xl bg-primary text-base-100 text-4xl font-bold rounded-lg hover:bg-secondary-dark transition-all"
+            className="m-3 w-20 h-16 sm:w-24 sm:h-20 sm:text-4xl md:w-28 md:h-24 md:text-5xl lg:w-32 lg:h-28 lg:text-6xl bg-primary text-base-100 text-3xl font-bold rounded-lg hover:bg-secondary-dark transition-all"
             key={number}
           >
             {number}

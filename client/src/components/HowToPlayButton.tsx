@@ -16,7 +16,7 @@ export default function HowToPlayButton(props: any) {
     <div className="p-4">
       <button
         onClick={handleClick}
-        className="w-full sm:w-64 h-16 sm:h-20 bg-secondary text-base-100 text-lg sm:text-xl font-semibold rounded-lg p-4 hover:bg-secondary-dark transition-all"
+        className="w-80 h-20 bg-secondary text-base-100 text-xl font-semibold rounded-lg p-5 hover:bg-secondary-dark transition-all sm:w-80 sm:h-20 sm:text-xl sm:p-4"
       >
         How To Play
       </button>
