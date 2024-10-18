@@ -19,7 +19,6 @@ const AdComponent = () => {
 
   return (
     <div>
-      <h1>Ad here</h1>
       <ins
         className="adsbygoogle"
         style={{ display: "block" }}

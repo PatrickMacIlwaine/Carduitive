@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import StartNewGame from "./StartNewGameButton";
 import HowToPlayButton from "./HowToPlayButton";
+import ContactFormButton from "./ContactFormButton";
 
 function HomePage() {
   const defaultSettings = {};
@@ -13,6 +14,7 @@ function HomePage() {
       </h1>
       <StartNewGame settings={settings} />
       <HowToPlayButton />
+      <ContactFormButton/>
     </div>
   );
 }
